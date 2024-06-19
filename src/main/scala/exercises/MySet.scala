@@ -13,13 +13,27 @@ trait MySet[A] extends (A => Boolean) {
 
   def contains(elem: A): Boolean
   def +(elem: A): MySet[A]
-  def ++(anotherSet: MySet[A]): MySet[A]
+  def ++(anotherSet: MySet[A]): MySet[A] // union
 
   def map[B](f: A => B): MySet[B]
   def flatMap[B](f: A => MySet[B]): MySet[B]
   def filter(predicate: A => Boolean): MySet[A]
   def foreach(f: A => Unit): Unit
 
+  /*
+    EXERCISE
+    - removing an element
+    - intersection with another set
+    - difference with another set
+   */
+
+  def -(elem: A): MySet[A]
+  def &(anotherSet: MySet[A]): MySet[A] // intersection
+  def --(anotherSet: MySet[A]): MySet[A] // difference
+
+  /*
+
+   */
 }
 
 class EmptySet[A] extends MySet[A] {
@@ -36,6 +50,14 @@ class EmptySet[A] extends MySet[A] {
   def filter(predicate: A => Boolean): MySet[A] = this
 
   def foreach(f: A => Unit): Unit = ()
+
+  // part 2
+
+  def -(elem: A): MySet[A] = this
+
+  def &(anotherSet: MySet[A]): MySet[A] = this
+
+  def --(anotherSet: MySet[A]): MySet[A] = this
 }
 
 class NonEmptySet[A](head: A, tail: MySet[A]) extends MySet[A] {
@@ -72,6 +94,16 @@ class NonEmptySet[A](head: A, tail: MySet[A]) extends MySet[A] {
     f(head)
     tail foreach f
   }
+
+  // part 2
+
+  def -(elem: A): MySet[A] =
+    if (head == elem) tail
+    else tail - elem + head
+
+  def &(anotherSet: MySet[A]): MySet[A] = filter(anotherSet.contains) // intercection = filtering!
+
+  def --(anotherSet: MySet[A]): MySet[A] = filter(x => !anotherSet(x))
 }
 
 object MySet {

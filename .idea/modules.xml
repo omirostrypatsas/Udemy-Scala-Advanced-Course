@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Udemy-Scala-Advanced-Course.iml" filepath="$PROJECT_DIR$/.idea/modules/Udemy-Scala-Advanced-Course.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Udemy-Scala-Advanced-Course-build.iml" filepath="$PROJECT_DIR$/.idea/modules/Udemy-Scala-Advanced-Course-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Udemy-Scala-Advanced-Course.Udemy-Scala-Advanced-Course-build.iml" filepath="$PROJECT_DIR$/.idea/modules/Udemy-Scala-Advanced-Course.Udemy-Scala-Advanced-Course-build.iml" />
     </modules>
   </component>
 </project>

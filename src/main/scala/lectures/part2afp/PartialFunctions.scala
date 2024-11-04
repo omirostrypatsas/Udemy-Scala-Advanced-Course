@@ -22,7 +22,9 @@ object PartialFunctions extends App{
     case 1 => 42
     case 2 => 56
     case 5 => 999
-  } // called partial function value and is equivalent in implementation to the one above.
+  } // curly braces and their contents are called partial function value and is equivalent in implementation to the one above.
+
+  // Partial functions are actually based on Pattern matching
 
   println(aPartialFunction(2))
   // println(aPartialFunction(7444)) // this will crush

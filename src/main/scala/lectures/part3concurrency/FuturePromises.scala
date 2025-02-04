@@ -103,4 +103,12 @@ object FuturePromises extends App{
 
   val fallbackResult = SocialNetwork.fetchProfile("unknown id").fallbackTo(SocialNetwork.fetchProfile("fb.id.0.dummy")) // if both fail, then the Exception of the first Future will be returned.
 
+  // online banking app
+  case class User(name: String)
+  case class Transaction(sender: String, receiver: String, amount: Double, status: String)
+
+  object BankingApp {
+
+  }
+
 }

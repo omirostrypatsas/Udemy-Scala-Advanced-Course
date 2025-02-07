@@ -1,7 +1,7 @@
 package lectures.part3concurrency
 
 import scala.concurrent.{Await, Future, Promise}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Random, Success, Try}
 import scala.concurrent.duration._
 
 // important for futures
@@ -159,5 +159,45 @@ object FuturePromises extends App{
 
   producer.start()
   Thread.sleep(1000)
+
+  /*
+    1) fulfill a future IMMEDIATELY with a value
+    2) inSequence(fa, fb)
+    3) first(fa, fb) => new future with the first value of the two Futures
+    4) last(fa, fb) => new future with the last value
+    5) retryUntil[T](action: () => Future[T], condition: T => Boolean): Future[T]
+   */
+
+  //Exercise 1)
+    Future.successful(println("Omiros"))
+
+  // Exercise 2)
+
+  def inSequence[A,B](fa: Future[A], fb: Future[B]): Future[B] = {
+    fa.flatMap(_ => fb)
+  }
+
+  def first[A](fa: Future[A], fb: Future[A]): Future[A] = {
+    val promise = Promise[A]
+
+//    def tryComplete(promise: Promise[A], result: Try[A]) = result match {
+//      case Success(r) => try {
+//        promise.success(r)
+//      } catch {
+//        case _ =>
+//      }
+//      case Failure(t) => try {
+//        promise.failure(t)
+//      } catch {
+//        case _ =>
+//      }
+//    }
+// so the above is redundant as we have the build in tryComplete method
+
+    fa.onComplete(promise.tryComplete)
+    fb.onComplete(promise.tryComplete)
+
+    promise.future
+  }
 
 }

@@ -177,6 +177,8 @@ object FuturePromises extends App{
     fa.flatMap(_ => fb)
   }
 
+  // Exercise 3)
+
   def first[A](fa: Future[A], fb: Future[A]): Future[A] = {
     val promise = Promise[A]
 
@@ -199,5 +201,36 @@ object FuturePromises extends App{
 
     promise.future
   }
+
+  // Exercise 4)
+
+  def last[A](fa: Future[A], fb: Future[A]): Future[A] = {
+    // 1 promise which both features will try to complete
+    // 2 promise which will be completed by the last feature
+    val bothPromise = Promise[A]
+    val lastPromise = Promise[A]
+    val checkAndComplete = (result: Try[A]) => if(!bothPromise.tryComplete(result))
+      lastPromise.complete(result)
+
+    fa.onComplete(checkAndComplete)
+    fb.onComplete( checkAndComplete)
+
+    lastPromise.future
+  }
+
+  val fast = Future {
+    Thread.sleep(100)
+    42
+  }
+
+  val slow = Future {
+    Thread.sleep(200)
+    45
+  }
+
+  first(fast, slow).foreach(println)
+  last(fast, slow).foreach(println)
+
+  Thread.sleep(1000)
 
 }

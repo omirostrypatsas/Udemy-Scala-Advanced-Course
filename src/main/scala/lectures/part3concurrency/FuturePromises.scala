@@ -1,7 +1,7 @@
 package lectures.part3concurrency
 
 import scala.concurrent.{Await, Future, Promise}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Random, Success, Try}
 import scala.concurrent.duration._
 
 // important for futures
@@ -158,6 +158,79 @@ object FuturePromises extends App{
   })
 
   producer.start()
+  Thread.sleep(1000)
+
+  /*
+    1) fulfill a future IMMEDIATELY with a value
+    2) inSequence(fa, fb)
+    3) first(fa, fb) => new future with the first value of the two Futures
+    4) last(fa, fb) => new future with the last value
+    5) retryUntil[T](action: () => Future[T], condition: T => Boolean): Future[T]
+   */
+
+  //Exercise 1)
+    Future.successful(println("Omiros"))
+
+  // Exercise 2)
+
+  def inSequence[A,B](fa: Future[A], fb: Future[B]): Future[B] = {
+    fa.flatMap(_ => fb)
+  }
+
+  // Exercise 3)
+
+  def first[A](fa: Future[A], fb: Future[A]): Future[A] = {
+    val promise = Promise[A]
+
+//    def tryComplete(promise: Promise[A], result: Try[A]) = result match {
+//      case Success(r) => try {
+//        promise.success(r)
+//      } catch {
+//        case _ =>
+//      }
+//      case Failure(t) => try {
+//        promise.failure(t)
+//      } catch {
+//        case _ =>
+//      }
+//    }
+// so the above is redundant as we have the build in tryComplete method
+
+    fa.onComplete(promise.tryComplete)
+    fb.onComplete(promise.tryComplete)
+
+    promise.future
+  }
+
+  // Exercise 4)
+
+  def last[A](fa: Future[A], fb: Future[A]): Future[A] = {
+    // 1 promise which both features will try to complete
+    // 2 promise which will be completed by the last feature
+    val bothPromise = Promise[A]
+    val lastPromise = Promise[A]
+    val checkAndComplete = (result: Try[A]) => if(!bothPromise.tryComplete(result))
+      lastPromise.complete(result)
+
+    fa.onComplete(checkAndComplete)
+    fb.onComplete( checkAndComplete)
+
+    lastPromise.future
+  }
+
+  val fast = Future {
+    Thread.sleep(100)
+    42
+  }
+
+  val slow = Future {
+    Thread.sleep(200)
+    45
+  }
+
+  first(fast, slow).foreach(println)
+  last(fast, slow).foreach(println)
+
   Thread.sleep(1000)
 
 }

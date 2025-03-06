@@ -228,9 +228,26 @@ object FuturePromises extends App{
     45
   }
 
-  first(fast, slow).foreach(println)
-  last(fast, slow).foreach(println)
+  first(fast, slow).foreach(f => println("FIRST: " + f))
+  last(fast, slow).foreach(l => println("LAST: " + l))
 
   Thread.sleep(1000)
+
+  // Exercise 5) retry until
+  def retryUntil[A](action: () => Future[A], condition: A => Boolean): Future[A] =
+  action().filter(condition).recoverWith {
+    case _ => retryUntil(action, condition)
+  }
+
+  val random = new Random()
+  val action = () => Future {
+    Thread.sleep(100)
+    val nextValue = random.nextInt(100)
+    println("generated " + nextValue)
+    nextValue
+  }
+
+  retryUntil(action, (x: Int) => x < 10).foreach(result => println("settled at " + result))
+  Thread.sleep(10000)
 
 }

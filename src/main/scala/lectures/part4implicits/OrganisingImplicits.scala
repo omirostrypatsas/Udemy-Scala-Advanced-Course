@@ -17,4 +17,17 @@ object OrganisingImplicits extends App {
       - accessor methods = defs with no parenthesis
    */
 
+  // Exercise
+  case class Person(name: String, age: Int)
+
+  val persons = List(
+    Person("Steve", 30),
+    Person("Amy", 22),
+    Person("John", 66)
+  )
+
+  implicit def reverseAlphabeticOrdering: Ordering[Person] = Ordering.fromLessThan((a,b) => a.name.compareTo(b.name) < 0)
+
+  println(persons.sorted)
+
 }

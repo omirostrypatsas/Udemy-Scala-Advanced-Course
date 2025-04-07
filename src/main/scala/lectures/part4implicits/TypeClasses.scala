@@ -34,7 +34,7 @@ object TypeClasses extends App {
     def serialize(value: T): String
   }
 
-  object UserSerializer extends HTMLSerializer[User] {
+  implicit object UserSerializer extends HTMLSerializer[User] {
     def serialize(user: User): String = s"<div>${user.name} (${user.age} yo) <a href=${user.email}/> </div>"
   }
 
@@ -54,8 +54,12 @@ object TypeClasses extends App {
   }
 
   //TYPE CLASS
-  trait MyTypecLASStEMPLATE[T] {
+  trait MyTypeClassTemplate[T] {
     def action(value: T): String
+  }
+
+  object MyTypeClassTemplate {
+    def apply[T](implicit instance: MyTypeClassTemplate[T]) = instance
   }
 
   /*
@@ -66,7 +70,7 @@ object TypeClasses extends App {
     def equal(value1: T, value2: T): String
   }
 
-  object NameEquality extends Equal[User] {
+  implicit object NameEquality extends Equal[User] {
     override def equal(user1: User, user2: User): String = if(user1.name == user2.name) "two names equal" else "two names not equal"
   }
 
@@ -74,5 +78,38 @@ object TypeClasses extends App {
     override def equal(user1: User, user2: User): String = if(user1.name == user2.name & user1.email == user2.email) "two names and emails are equal" else "two names and emails are not equal"
 
   }
+
+  // Part 2
+
+  object HTMLSerializer {
+    def serialize[T](value: T)(implicit serializer: HTMLSerializer[T]): String =
+      serializer.serialize(value)
+
+    def apply[T](implicit serializer: HTMLSerializer[T]) = serializer
+  }
+
+  implicit object IntSerializer extends HTMLSerializer[Int] {
+    override def serialize(value: Int): String = s"<div style: color=blue>$value</div>"
+  }
+
+  println(HTMLSerializer.serialize(42))
+  println(HTMLSerializer.serialize(john))
+
+  // access to the entire type class interface
+  println(HTMLSerializer[User].serialize(john))
+
+  /*
+    Exercise: implement the TC pattern for the Equality tc.
+   */
+
+  object Equal {
+    def apply[T](a: T, b: T)(implicit equalizer: Equal[T]): String =
+      equalizer.equal(a, b)
+  }
+
+  val anotherJohn = User("John", 45, "anotherJohn@rtjvm.com")
+  println(Equal(john, anotherJohn))
+
+  // AD-HOC polymorphism
 
 }

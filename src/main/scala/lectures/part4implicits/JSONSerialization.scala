@@ -73,6 +73,13 @@ object JSONSerialization extends App {
     def convert(value: T): JSONValue
   }
 
+  // 2.3 conversion
+
+  implicit class JSONOps[T](value: T) {
+    def toJSON(implicit converter: JSONConverter[T]): JSONValue =
+      converter.convert(value)
+  }
+
   // 2.2
 
   // existing data types
@@ -102,13 +109,20 @@ object JSONSerialization extends App {
 
   implicit object FeedConverter extends JSONConverter[Feed] {
     def convert(feed: Feed): JSONValue = JSONObject(Map(
-      "user" -> UserConverter.convert(feed.user), // TODO
-      "posts" -> JSONArray(feed.posts.map(PostConverter.convert)) // TODO
+      "user" -> feed.user.toJSON,
+      "posts" -> JSONArray(feed.posts.map(_.toJSON))
     ))
   }
 
-  // 2.3 conversion
-
   // call stringify on result
+
+  val now = new Date(System.currentTimeMillis())
+  val john = new User("John", 34, "john@rockthejvm.com")
+  val feed = new Feed(john, List(
+    Post("hello", now),
+    Post("Look at this cute puppy", now)
+  ))
+
+  println(feed.toJSON.stringify)
 
 }

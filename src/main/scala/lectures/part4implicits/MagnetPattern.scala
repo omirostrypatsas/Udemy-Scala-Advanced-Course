@@ -29,7 +29,7 @@ object MagnetPattern extends App{
      val receiveFV = receive _ // ?!
 
     3 - code duplication
-    4 - type inference and defaults args
+    4 - type inference and default args
 
       actor.receive(?!)
    */
@@ -71,5 +71,83 @@ object MagnetPattern extends App{
 
   println(receive(Future(new P2PRequest)))
   println(receive(Future(new P2PResponse)))
+
+  // 2 - lifting works
+  trait MathLib {
+    def add1(x: Int) = x + 1
+    def add1(s: String) = s.toInt + 1
+    // add1 overloads
+  }
+
+  // "magnetize"
+  trait AddMagnet {
+    def apply(): Int
+  }
+
+  def add1(magnet: AddMagnet): Int = magnet()
+
+  implicit class AddInt(x: Int) extends AddMagnet {
+    override def apply(): Int = x + 1
+  }
+
+  implicit class AddString(s: String) extends AddMagnet {
+    override def apply(): Int = s.toInt + 1
+  }
+
+  val addFV = add1 _
+  println(addFV(1))
+  println(addFV("3"))
+
+  //  val receiveFV = receive _
+  //  receiveFV(new P2PResponse)
+  //  compiler will get confused
+
+  /*
+    Drawbacks
+    1 - verbose
+    2 - hard to read
+    3 - you can't name or place default arguments
+    4 - call by name doesn't work correctly
+    (exercise: prove it!) (hint: think of side effects)
+   */
+
+  class Handler {
+    def handler(s: => String) = {
+      println(s)
+      println(s)
+    }
+    // other overloads
+  }
+
+  trait HandleMagnet {
+    def apply(): Unit
+  }
+
+  def handle(magnet: HandleMagnet) = magnet()
+
+  implicit class StringHandle(s: => String) extends HandleMagnet {
+    override def apply(): Unit = {
+      println(s)
+      println(s)
+    }
+  }
+
+  def sideEffectMethod(): String = {
+    println("Hello, Scala")
+    "hahahah"
+  }
+
+  handle(sideEffectMethod())// this will print them twice
+
+  handle {
+    println("Hello, Scala")
+    "hahahah"
+  } // this will print only the hahaha twice as it is the only one passed
+  // be careful with side effects, very hard to trace back
+
+  handle {
+    println("Hello, Scala")
+    new StringHandle("hahahah")
+  }
 
 }

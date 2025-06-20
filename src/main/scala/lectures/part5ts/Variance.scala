@@ -1,5 +1,7 @@
 package lectures.part5ts
 
+import java.awt.ScrollPane
+
 object Variance extends App {
 
   trait Animal
@@ -104,5 +106,66 @@ object Variance extends App {
     - method arguments are in CONTRAVARIANT position
     - return types are in COVARIANT position
    */
+
+  /*
+    1. Invariant, Covariant, Contravariant
+       Parking[T](things: List[T]) {
+        park(vehicle: T)
+        impound(vehicles: List[T])
+        checkVehicles(conditions: String): List[T]
+       }
+
+     2. Used someone else's API: List[T]
+     3. Parking = monad!
+          - flatmap
+   */
+
+  class Vehicle
+  class Bike extends Vehicle
+  class Car extends Vehicle
+
+  class IList[T]
+
+  class IParking[T](vehicles: List[T]) {
+    def park(vehicle: T): IParking[T] = ???
+    def impound(vehicles: List[T]): IParking[T] = ???
+    def checkVehicles(conditions: String): List[T] = ???
+
+    def flatMap[S](f:  T => IParking[S]): IParking[S] = ???
+  }
+
+  class CParking[+T](vehicles: List[T]) {
+    def park[S >: T](vehicle: S): CParking[S] = ???
+    def impound[S >: T](vehicles: List[S]): CParking[S] = ???
+    def checkVehicles(conditions: String): List[T] = ???
+
+    def flatMap[S](f:  T => CParking[S]): CParking[S] = ???
+  }
+
+  class VParking[-T](vehicles: List[T]) {
+    def park(vehicle: T): VParking[T] = ???
+    def impound(vehicles: List[T]): VParking[T] = ???
+    def checkVehicles[S <: T](conditions: String): List[S] = ???
+
+    def flatMap[R <: T,S ](f:  Function1[R, VParking[S]]): VParking[S] = ???
+  }
+
+  /*
+  Rule of thumb
+  - use covariance = COLLECTION OF THINGS
+  - use contravariance = GROUP OF ACTIONS
+ */
+
+  class CParking2[+T](vehicles: IList[T]) {
+    def park[S >: T](vehicle: S): CParking2[S] = ???
+    def impound[S >: T](vehicles: IList[S]): CParking2[S] = ???
+    def checkVehicles[S >: T](conditions: String): IList[S] = ???
+  }
+
+  class VParking2[-T](vehicles: IList[T]) {
+    def park(vehicle: T): VParking2[T] = ???
+    def impound[S <: T](vehicles: IList[S]): VParking2[S] = ???
+    def checkVehicles[S <: T](conditions: String): IList[S] = ???
+  }
 
 }

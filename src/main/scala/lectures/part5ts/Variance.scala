@@ -1,7 +1,5 @@
 package lectures.part5ts
 
-import java.awt.ScrollPane
-
 object Variance extends App {
 
   trait Animal

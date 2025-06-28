@@ -1,5 +1,6 @@
 package lectures.part5ts
 
+import lectures.part1as.AdvancedPatternMatching.{MyList, humanDescription}
 import lectures.part5ts
 
 object TypeMembers extends App{
@@ -52,5 +53,26 @@ object TypeMembers extends App{
     def head: A
     def tail: MList
   }
+
+  trait ApplicableToNumbers {
+    type A <: Number
+  }
+
+  // NOT OK
+//  class CustomList(hd: String, tl: CustomList) extends MList with ApplicableToNumbers { // extending with ApplicableToNumbers won't work as the type is Sting
+//    type A = String
+//    def head = hd
+//    def tail = tl
+//  }
+
+  // OK
+  class IntList(hd: Int, tl: IntList) extends MList {
+    type A = Int
+    def head = hd
+    def tail = tl
+  }
+
+  // Number
+  // type members and type member constraints (bounds)
 
 }
